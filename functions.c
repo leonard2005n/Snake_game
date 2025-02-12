@@ -6,15 +6,46 @@
 #include <time.h>
 #include "functions.h"
 #include "game_logic.h"
+#include "snake.h"
 
 //Function that initialize the playable area
-void initialize_game(char v[][200], int *m)
+void initialize_game(char v[][200], int *m, snake *s, snake *food)
 {
 	int n;
 	printf("Enter the size of the game: ");
 	scanf("%d", &n);
+	configure_terminal();
+	s->lenght = 2;
+	s->body[0].x = n / 2;
+	s->body[0].y = n / 2;
+	s->body[1].x = n / 2 - 1;
+	s->body[1].y = n / 2;
 	
-	//Makes the border of the game
+	//Put the food in the playable area
+	int i = 0;
+	while (i < 5) {
+		int x, y, ok = 1;
+		random_coordinates(&x, &y, n);
+		for (int j = 0; j < 2; j++) {
+			if (x == s->body[j].x && y == s->body[j].y)
+				ok = 0;
+		}
+		for (int j = 0; j < i; j++) {
+			if (x == food->body[j].x && y == food->body[j].y) 
+				ok = 0;
+		}
+		if (ok == 1) {
+			food->body[i].x = x;
+			food->body[i].y = y;
+			i++;
+		}
+	}
+	food->lenght = 5;
+	*m = n;
+}
+
+void draw(char v[][200], int n, snake *s, snake *food)
+{
 	for (int i = 0; i < n + 1; i++) {
 		for (int j = 0; j < n + 1; j++) {
 			if (i == 0)
@@ -25,29 +56,37 @@ void initialize_game(char v[][200], int *m)
 				v[n][j] = 'X';
 			else if (j == n)
 				v[i][n] = 'X';
-			else 
+			else
 				v[i][j] = ' ';
 		}
 	}
 
-	//Puts the food in the playable area
 	for (int i = 0; i < 5; i++) {
-		place_food(v, n);
+		v[food->body[i].x][food->body[i].y] = '*';
 	}
 
-	*m = n;
+	v[s->body[0].x][s->body[0].y] = '@';
+	for (int i = 1; i < s->lenght; i++) {
+		v[s->body[i].x][s->body[i].y] = '#';
+	}
 }
 
 //Function that returns coordinates of two values
 void random_coordinates(int *x, int *y, int n)
 {
-	*x = rand() % n + 1;
-	*y = rand() % n + 1;
+	*x = rand() % n;
+	*y = rand() % n;
+
+	if(*x == 0)
+		(*x)++;
+	if(*y == 0)
+		(*y)++;
 }
 
 //Function that prints a frame to the screen
 void print_game(char v[][200], int n)
 {
+	printf("\033[H\033[J");
 	for (int i = 0; i < n + 1; i++) {
 		printf("%s\n", v[i]);
 	}
@@ -93,4 +132,20 @@ int kbhit() {
     }
 
     return 0;
+}
+
+//Takes the input of the keyboard and move the snake
+void input(char v[][200], int *m, snake *s, snake *food)
+{
+	int n = *m;
+	char c = getchar();
+
+	if (c == 'w')
+		move(s, -1, 0, food, n);
+	else if (c == 'd')
+		move(s, 0, 1, food, n);
+	else if (c == 's')
+		move(s, 1, 0, food, n);
+	else if (c == 'a')
+		move(s, 0, -1, food, n);  
 }
