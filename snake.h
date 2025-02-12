@@ -1,5 +1,5 @@
 #pragma once
-#define MAX 200
+#define MAX 500
 
 typedef struct {
 	int x, y;

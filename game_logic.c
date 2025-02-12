@@ -20,7 +20,7 @@ void place_food(snake *food, snake *s, int n, int i) {
 			if (x == s->body[j].x && y == s->body[j].y)
 				ok = 0;
 		}
-		for (int j = 0; j < i; j++) {
+		for (int j = 0; j < 5; j++) {
 			if (x == food->body[j].x && y == food->body[j].y) 
 				ok = 0;
 		}
@@ -52,7 +52,7 @@ int food_colision(snake *s, int x, int y, snake *food, int n)
 
 	for (int i = 0; i < 5; i++) {
 		if (x == food->body[i].x && y == food->body[i].y) {
-			if (food->lenght + s->lenght < n * n) {
+			if (food->lenght + s->lenght + 1 <= (n - 1) * (n - 1)) {
 				place_food(food, s, n, i);
 			}
 			else {

@@ -138,14 +138,28 @@ int kbhit() {
 void input(char v[][200], int *m, snake *s, snake *food)
 {
 	int n = *m;
-	char c = getchar();
-
-	if (c == 'w')
+	char c;
+	static char x = 's';
+	if (!kbhit()) {
+		c = x;
+	} else {
+		c = getchar();
+	}
+	if (c == 'w' && x != 's') {
 		move(s, -1, 0, food, n);
-	else if (c == 'd')
+		x = c;
+	}
+	else if (c == 'd' && x != 'a') {
 		move(s, 0, 1, food, n);
-	else if (c == 's')
+		x = c;
+	}
+	else if (c == 's' && x != 'w') {
 		move(s, 1, 0, food, n);
-	else if (c == 'a')
-		move(s, 0, -1, food, n);  
+		x = c;
+	}
+	else if (c == 'a' && x != 'd') {
+		move(s, 0, -1, food, n);
+		x = c;  
+	}
+
 }
