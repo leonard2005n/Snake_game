@@ -7,7 +7,10 @@ void place_food(snake *food, snake *s, int n, int i);
 void game(char v[][200], int n, snake *s);
 
 //Move the snake
-void move(snake *s, int x, int y, snake *food, int n);
+int move(snake *s, int x, int y, snake *food, int n, long *score);
 
 //See if the snake colided with the food
-int food_colision(snake *s, int x, int y, snake *food, int n);
+int food_collision(snake *s, int x, int y, snake *food, int n);
+
+//See if the snake colided with someting to trigger a game over
+int obstacle_collision(snake *s, int x, int y, int n);

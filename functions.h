@@ -5,10 +5,10 @@
 void border(char v[][200], int n);
 
 //Function that prints a frame to the screen
-void print_game(char v[][200], int n);
+void print_game(char v[][200], int n, long score);
 
 //Function that initialize the playable area
-void initialize_game (char v[][200], int *n, snake *s, snake *food);
+void initialize_game (int *n, snake *s, snake *food);
 
 //Function that returns coordinates of two values
 void random_coordinates(int *x, int *y, int n);
@@ -26,4 +26,7 @@ void configure_terminal();
 void draw(char v[][200], int n, snake *s,snake *food);
 
 //Takes the input of the keyboard and move the snake
-void input(char v[][200], int *m, snake *s, snake *food);
+int input(char v[][200], int *m, snake *s, snake *food, long *score);
+
+//Function that prints the game over screen
+void game_over(long score);

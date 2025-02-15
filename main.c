@@ -11,17 +11,19 @@ int main(void)
 	srand(time(NULL));
 	char board[200][200] = {0};
 	snake s, food;
-	int n;
+	int n, ok = 1;
+	long score = 0;
 
-	initialize_game(board, &n, &s, &food);
+	initialize_game(&n, &s, &food);
 	draw(board, n, &s, &food);
-		print_game(board, n);
-	while (1) {
+		print_game(board, n, score);
+	while (ok) {
 		draw(board, n, &s, &food);
-		print_game(board, n);
-		usleep(225000); // Sleep for 100 milliseconds
-		input(board, &n, &s, &food);
+		print_game(board, n, score);
+		usleep(225000);
+		ok = input(board, &n, &s, &food, &score);
 	}
+	game_over(score);
 	restore_terminal();
 	return 0;
 }

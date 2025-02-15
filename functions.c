@@ -9,11 +9,15 @@
 #include "snake.h"
 
 //Function that initialize the playable area
-void initialize_game(char v[][200], int *m, snake *s, snake *food)
+void initialize_game(int *m, snake *s, snake *food)
 {
 	int n;
-	printf("Enter the size of the game: ");
+	printf("Enter the size of the game(6 - 150): ");
 	scanf("%d", &n);
+	while (n < 6 || 150 < n) {
+		printf("Wrong value please enter a value bettween 6 and 150:");
+		scanf("%d", &n);
+	}
 	configure_terminal();
 	s->lenght = 2;
 	s->body[0].x = n / 2;
@@ -84,9 +88,10 @@ void random_coordinates(int *x, int *y, int n)
 }
 
 //Function that prints a frame to the screen
-void print_game(char v[][200], int n)
+void print_game(char v[][200], int n, long score)
 {
 	printf("\033[H\033[J");
+	printf("SCORE: %ld00\n", score);
 	for (int i = 0; i < n + 1; i++) {
 		printf("%s\n", v[i]);
 	}
@@ -135,9 +140,9 @@ int kbhit() {
 }
 
 //Takes the input of the keyboard and move the snake
-void input(char v[][200], int *m, snake *s, snake *food)
+int input(char v[][200], int *m, snake *s, snake *food, long *score)
 {
-	int n = *m;
+	int n = *m, ok = 1;
 	char c;
 	static char x = 's';
 	if (!kbhit()) {
@@ -146,20 +151,31 @@ void input(char v[][200], int *m, snake *s, snake *food)
 		c = getchar();
 	}
 	if (c == 'w' && x != 's') {
-		move(s, -1, 0, food, n);
+		ok = move(s, -1, 0, food, n, score);
 		x = c;
 	}
 	else if (c == 'd' && x != 'a') {
-		move(s, 0, 1, food, n);
+		ok = move(s, 0, 1, food, n, score);
 		x = c;
 	}
 	else if (c == 's' && x != 'w') {
-		move(s, 1, 0, food, n);
+		ok = move(s, 1, 0, food, n, score);
 		x = c;
 	}
 	else if (c == 'a' && x != 'd') {
-		move(s, 0, -1, food, n);
+		ok = move(s, 0, -1, food, n, score);
 		x = c;  
+	} else {
+		return input(v, m, s, food, score);
 	}
 
+	return ok;
+}
+
+//Function that prints the game over screen
+void game_over(long score)
+{
+	printf("\033[H\033[J");
+	printf("GAME OVER!\n");
+	printf("SCORE: %ld00\n", score);
 }

@@ -32,20 +32,27 @@ void place_food(snake *food, snake *s, int n, int i) {
 }
 
 //Move the snake
-void move(snake *s, int x, int y, snake *food, int n)
+int move(snake *s, int x, int y, snake *food, int n, long *score)
 {
-	if (food_colision(s, x, y, food, n)) {
+	if (food_collision(s, x, y, food, n)) {
 		s->lenght++;
+		*score += 1;
 	}
+
+	if (obstacle_collision(s, x, y, n)) {
+		return 0;
+	}
+
 	for (int i = s->lenght - 1; i > 0; i--) {
 		s->body[i] = s->body[i - 1];
 	}
 	s->body[0].x += x;
 	s->body[0].y += y;
+	return 1;
 }
 
 //See if the snake colided with the food
-int food_colision(snake *s, int x, int y, snake *food, int n)
+int food_collision(snake *s, int x, int y, snake *food, int n)
 {
 	x += s->body[0].x;
 	y += s->body[0].y;
@@ -63,5 +70,25 @@ int food_colision(snake *s, int x, int y, snake *food, int n)
 			return 1;
 		}
 	}
+	return 0;
+}
+
+//See if the snake colided with someting to trigger a game over
+int obstacle_collision(snake *s, int x, int y, int n)
+{
+	x += s->body[0].x;
+	y += s->body[0].y;
+
+	if (x == 0 || y == 0)
+		return 1;
+	
+	if (x == n || y == n)
+		return 1;
+
+	for (int i = 1 ; i < s->lenght; i++) {
+		if (x == s->body[i].x && y == s->body[i].y)
+			return 1;
+	}
+
 	return 0;
 }
