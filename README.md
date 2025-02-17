@@ -20,7 +20,7 @@ This is a simple Snake Game implemented in C.
 	```
 3. Compile the game:
 	```sh
-	gcc -o snake_game snake_game.c
+	make
 	```
 
 ## Running the Game
