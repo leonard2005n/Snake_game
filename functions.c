@@ -66,6 +66,7 @@ int initialize_game(int *m, snake *s, snake *food)
 	return 0;
 }
 
+//Function that draws a frame
 void draw(char v[][200], int n, snake *s, snake *food)
 {
 	for (int i = 0; i < n + 1; i++) {
