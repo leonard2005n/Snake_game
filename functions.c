@@ -9,14 +9,27 @@
 #include "snake.h"
 
 //Function that initialize the playable area
-void initialize_game(int *m, snake *s, snake *food)
+int initialize_game(int *m, snake *s, snake *food)
 {
 	int n;
-	printf("Enter the size of the game(6 - 150): ");
-	scanf("%d", &n);
-	while (n < 6 || 150 < n) {
-		printf("Wrong value please enter a value bettween 6 and 150:");
+	char c;
+	printf("You want to see a bot playing? y/N\n");
+	scanf("%c", &c);
+
+	if (c == 'y') {
+		printf("Enter the size of the game (6 - 150) that is even: ");
 		scanf("%d", &n);
+		while (n < 6 || 150 < n || n % 2 == 0) {
+			printf("Wrong value please enter a value bettween 6 and 150 that is even:");
+			scanf("%d", &n);
+		}
+	} else {
+		printf("Enter the size of the game(6 - 150): ");
+		scanf("%d", &n);
+		while (n < 6 || 150 < n) {
+			printf("Wrong value please enter a value bettween 6 and 150:");
+			scanf("%d", &n);
+		}
 	}
 	configure_terminal();
 	s->lenght = 2;
@@ -46,6 +59,11 @@ void initialize_game(int *m, snake *s, snake *food)
 	}
 	food->lenght = 5;
 	*m = n;
+
+	if (c == 'y')
+	 return 1;
+	
+	return 0;
 }
 
 void draw(char v[][200], int n, snake *s, snake *food)
@@ -88,13 +106,15 @@ void random_coordinates(int *x, int *y, int n)
 }
 
 //Function that prints a frame to the screen
-void print_game(char v[][200], int n, long score)
+void print_game(char v[][200], int n, long score, snake *s)
 {
 	printf("\033[H\033[J");
 	printf("SCORE: %ld00\n", score);
 	for (int i = 0; i < n + 1; i++) {
 		printf("%s\n", v[i]);
 	}
+	//FOR DEBUG
+	// printf("%d %d\n", s->body[0].x, s->body[0].y);
 }
 
 // Function to configure the terminal for non-canonical mode
@@ -140,15 +160,19 @@ int kbhit() {
 }
 
 //Takes the input of the keyboard and move the snake
-int input(char v[][200], int *m, snake *s, snake *food, long *score)
+int input(char v[][200], int *m, snake *s, snake *food, long *score, int bot)
 {
 	int n = *m, ok = 1;
 	char c;
 	static char x = 's';
-	if (!kbhit()) {
-		c = x;
+	if (bot) {
+		input_bot(s, &n, &c);
 	} else {
-		c = getchar();
+		if (!kbhit()) {
+			c = x;
+		} else {
+			c = getchar();
+		}
 	}
 	if (c == 'w' && x != 's') {
 		ok = move(s, -1, 0, food, n, score);
@@ -166,9 +190,12 @@ int input(char v[][200], int *m, snake *s, snake *food, long *score)
 		ok = move(s, 0, -1, food, n, score);
 		x = c;  
 	} else {
-		return input(v, m, s, food, score);
+		return input(v, m, s, food, score, bot);
 	}
 
+	//FOR DEBUG
+	// FILE *out = fopen("last.txt", "a");
+	// fprintf(out, "%c\n", c);
 	return ok;
 }
 
@@ -178,4 +205,45 @@ void game_over(long score)
 	printf("\033[H\033[J");
 	printf("GAME OVER!\n");
 	printf("SCORE: %ld00\n", score);
+}
+
+//Inputs that are genereted by the bot
+void input_bot(snake *s, int *m, char *c)
+{
+	int n = *m;
+	static int path = 0;
+	static int direction  = 1;
+	if (path == 0) {
+		if (s->body[0].x == n - 1) {
+			path = 1 ;
+			*c = 'a';
+			return;
+		} 
+		*c = 's';
+		return;
+	} else {
+		if (s->body[0].y == n - 1 && s->body[0].x == 1) {
+			path = 0;
+			direction = 1;
+			*c = 's';
+			return;
+		}
+		if (direction  == 1) {
+			if (s->body[0].y == 1) {
+				direction = 2;
+				*c = 'w';
+				return;
+			}
+			*c = 'a';
+			return;
+		} else {
+			if (s->body[0].y == n - 2 && s->body[0].x != 1) {
+				direction = 1;
+				*c = 'w';
+				return;
+			}
+			*c = 'd';
+			return;
+		}
+	}
 }
